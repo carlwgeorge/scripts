@@ -105,8 +105,7 @@ do_install() {
     if ${TESTCMD} ${PYTHON}-virtualenv &> /dev/null; then
         echo "PASS"
     else
-        echo "FAIL"
-        echo "installing package ${PYTHON}-virtualenv..."
+        echo "installing..."
         ${INSTALLCMD} ${PYTHON}-virtualenv || fail "FAIL"
         echo "PASS"
     fi
