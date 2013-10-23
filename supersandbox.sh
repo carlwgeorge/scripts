@@ -159,7 +159,7 @@ do_install() {
 	cat <<-EOF | ${SUDO} tee ${MYBINPATH}/supernova-keyring-helper &> /dev/null
 	#!/bin/bash
 	. ${MYINSTALLPATH}/bin/activate
-	${MYINSTALLPATH}/bin/supernova-keyring-helper \${@}"
+	${MYINSTALLPATH}/bin/supernova-keyring-helper \${@}
 	EOF
 	${SUDO} chmod +x ${MYBINPATH}/supernova-keyring-helper
 	echo "PASS"
