@@ -150,11 +150,11 @@ do_install() {
     supernova-keyring-helper_wrapper="#!/bin/bash\n. ${MYINSTALLPATH}/bin/activate\n${MYINSTALLPATH}/bin/supernova-keyring-helper \${@}"
     config_template="[mine]\nOS_AUTH_SYSTEM=rackspace\nOS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/\nOS_TENANT_NAME=USE_KEYRING\nOS_PROJECT_ID=USE_KEYRING\nOS_USERNAME=USE_KEYRING\nOS_PASSWORD=USE_KEYRING\nOS_REGION_NAME=USE_KEYRING\nNOVA_RAX_AUTH=1"
     echo -n "creating wrapper scripts..."
-    echo "${supernova_wrapper}" | ${SUDO} tee ${MYBINPATH}/supernova &> /dev/null
+    echo -e "${supernova_wrapper}" | ${SUDO} tee ${MYBINPATH}/supernova &> /dev/null
     ${SUDO} chmod +x ${MYBINPATH}/supernova
-    echo "${supernova-keyring_wrapper}" | ${SUDO} tee ${MYBINPATH}/supernova-keyring &> /dev/null
+    echo -e "${supernova-keyring_wrapper}" | ${SUDO} tee ${MYBINPATH}/supernova-keyring &> /dev/null
     ${SUDO} chmod +x ${MYBINPATH}/supernova-keyring
-    echo "${supernova-keyring-helper_wrapper}" | ${SUDO} tee ${MYBINPATH}/supernova-keyring-helper &> /dev/null
+    echo -e "${supernova-keyring-helper_wrapper}" | ${SUDO} tee ${MYBINPATH}/supernova-keyring-helper &> /dev/null
     ${SUDO} chmod +x ${MYBINPATH}/supernova-keyring-helper
     echo "PASS"
 
