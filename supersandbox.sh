@@ -49,7 +49,7 @@ set_variables() {
         OSNAME="debian"
         PYTHON="python"
         VIRTUALENV="virtualenv"
-        TESTCMD="dpkg -l"
+        TESTCMD="dpkg -s"
         INSTALLCMD="sudo apt-get install"
         REMOVECMD="sudo apt-get purge"
     elif [[ -f /etc/fedora-release ]]; then
