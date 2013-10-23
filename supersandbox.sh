@@ -142,21 +142,21 @@ do_install() {
 	# create wrapper scripts
 	echo -n "creating wrapper scripts..."
 	# supernova
-	cat <<-EOF | ${SUDO} tee ${MYBINPATH}/supernova &> /dev/null
+	cat <<- EOF | ${SUDO} tee ${MYBINPATH}/supernova &> /dev/null
 	#!/bin/bash
 	. ${MYINSTALLPATH}/bin/activate
 	${MYINSTALLPATH}/bin/supernova \${@}
 	EOF
 	${SUDO} chmod +x ${MYBINPATH}/supernova
 	# supernova-keyring
-	cat <<-EOF | ${SUDO} tee ${MYBINPATH}/supernova-keyring &> /dev/null
+	cat <<- EOF | ${SUDO} tee ${MYBINPATH}/supernova-keyring &> /dev/null
 	#!/bin/bash
 	. ${MYINSTALLPATH}/bin/activate
 	${MYINSTALLPATH}/bin/supernova-keyring \${@}
 	EOF
 	${SUDO} chmod +x ${MYBINPATH}/supernova-keyring
 	# supernova-keyring-helper
-	cat <<-EOF | ${SUDO} tee ${MYBINPATH}/supernova-keyring-helper &> /dev/null
+	cat <<- EOF | ${SUDO} tee ${MYBINPATH}/supernova-keyring-helper &> /dev/null
 	#!/bin/bash
 	. ${MYINSTALLPATH}/bin/activate
 	${MYINSTALLPATH}/bin/supernova-keyring-helper \${@}
@@ -165,9 +165,18 @@ do_install() {
 	echo "PASS"
 
 	# create config file template
-	config_template="[mine]\nOS_AUTH_SYSTEM=rackspace\nOS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/\nOS_TENANT_NAME=USE_KEYRING\nOS_PROJECT_ID=USE_KEYRING\nOS_USERNAME=USE_KEYRING\nOS_PASSWORD=USE_KEYRING\nOS_REGION_NAME=USE_KEYRING\nNOVA_RAX_AUTH=1"
 	echo -n "creating configuration template file ~/.supernova.sample ..."
-	echo "${config_template}" | tee ~/.supernova.sample &> /dev/null
+	cat <<- EOF | tee ~/.supernova.sample &> /dev/null
+	[mine]
+	OS_AUTH_SYSTEM=rackspace
+	OS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/
+	OS_TENANT_NAME=USE_KEYRING
+	OS_PROJECT_ID=USE_KEYRING
+	OS_USERNAME=USE_KEYRING
+	OS_PASSWORD=USE_KEYRING
+	OS_REGION_NAME=USE_KEYRING
+	NOVA_RAX_AUTH=1
+	EOF
 	echo "PASS"
 }
 
