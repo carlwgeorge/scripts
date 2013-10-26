@@ -6,7 +6,7 @@
 MYBINPATH="/usr/local/bin"
 
 # location for virtualenvs
-MYENVPATH="/usr/local/virtualenv"
+MYENVPATH="/usr/local/virtualenvs"
 
 # is sudo required to write to the above directories?
 DOISUDO="yes"
