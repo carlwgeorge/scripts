@@ -162,27 +162,14 @@ do_install() {
 
 	# create wrapper scripts
 	echo -n "creating wrapper scripts..."
-	# supernova
-	cat <<- EOF | ${SUDO} tee ${MYBINPATH}/supernova &> /dev/null
-	#!/bin/bash
-	. ${MYINSTALLPATH}/bin/activate
-	${MYINSTALLPATH}/bin/supernova \${@}
-	EOF
-	${SUDO} chmod +x ${MYBINPATH}/supernova
-	# supernova-keyring
-	cat <<- EOF | ${SUDO} tee ${MYBINPATH}/supernova-keyring &> /dev/null
-	#!/bin/bash
-	. ${MYINSTALLPATH}/bin/activate
-	${MYINSTALLPATH}/bin/supernova-keyring \${@}
-	EOF
-	${SUDO} chmod +x ${MYBINPATH}/supernova-keyring
-	# supernova-keyring-helper
-	cat <<- EOF | ${SUDO} tee ${MYBINPATH}/supernova-keyring-helper &> /dev/null
-	#!/bin/bash
-	. ${MYINSTALLPATH}/bin/activate
-	${MYINSTALLPATH}/bin/supernova-keyring-helper \${@}
-	EOF
-	${SUDO} chmod +x ${MYBINPATH}/supernova-keyring-helper
+	for each in nova supernova supernova-keyring supernova-keyring-helper; do
+		cat <<- EOF | ${SUDO} tee ${MYBINPATH}/${each} &> /dev/null
+		#!/bin/bash
+		. ${MYINSTALLPATH}/bin/activate
+		${MYINSTALLPATH}/bin/${each} \${@}
+		EOF
+		${SUDO} chmod +x ${MYBINPATH}/${each}
+	done
 	echo "${PASS}"
 
 	# create config file template
@@ -214,6 +201,12 @@ do_remove() {
 	fi
 
 	# delete wrapper scripts
+	if [[ -f ${MYBINPATH}/nova ]]; then
+		echo -n "remove wrapper script ${MYBINPATH}/nova? ${YESNO} "; read x
+		if [[ "${x}" == "y" ]]; then
+			${SUDO} rm -f ${MYBINPATH}/nova || fail
+		fi
+	fi
 	if [[ -f ${MYBINPATH}/supernova ]]; then
 		echo -n "remove wrapper script ${MYBINPATH}/supernova? ${YESNO} "; read x
 		if [[ "${x}" == "y" ]]; then
