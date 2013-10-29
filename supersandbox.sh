@@ -23,6 +23,22 @@ HELPERADDON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.3.tar.g
 
 ############################################################
 
+# text formatting
+_und=$(tput sgr 0 1) # underline
+_bld=$(tput bold)    # bold
+_red=$(tput setaf 1) # red
+_gre=$(tput setaf 2) # green
+_yel=$(tput setaf 3) # yellow
+_blu=$(tput setaf 4) # blue
+_pur=$(tput setaf 5) # purple
+_cya=$(tput setaf 6) # cyan
+_wht=$(tput setaf 7) # white
+_res=$(tput sgr0)    # reset
+# echo -e "${_bld}${_red}Usage example.${_res}"
+
+PASS="${_bld}${_gre}PASS${_res}"
+FAIL="${_bld}${_red}FAIL${_res}"
+
 fail() {
 	# this function is for quitters!
 	echo -e "${@}"
@@ -77,84 +93,84 @@ do_install() {
 	# test if there already is scripts in our desired location
 	echo -n "checking for supernova wrapper script conflict..."
 	if [[ ! -f ${MYBINPATH}/supernova ]]; then
-		echo "PASS"
+		echo "${PASS}"
 	else
-		fail "FAIL\n${MYBINPATH}/supernova already exists"
+		fail "${FAIL}\n${MYBINPATH}/supernova already exists"
 	fi
 	echo -n "checking for supernova-keyring wrapper script conflict..."
 	if [[ ! -f ${MYBINPATH}/supernova-keyring ]]; then
-		echo "PASS"
+		echo "${PASS}"
 	else
-		fail "FAIL\n${MYBINPATH}/supernova-keyring already exists"
+		fail "${FAIL}\n${MYBINPATH}/supernova-keyring already exists"
 	fi
 	echo -n "checking for supernova-keyring-helper wrapper script conflict..."
 	if [[ ! -f ${MYBINPATH}/supernova-keyring-helper ]]; then
-		echo "PASS"
+		echo "${PASS}"
 	else
-		fail "FAIL\n${MYBINPATH}/supernova-keyring-helper already exists"
+		fail "${FAIL}\n${MYBINPATH}/supernova-keyring-helper already exists"
 	fi
 
 	# test for gcc, and install it if necessary
 	echo -n "checking for gcc package..."
 	if ${TESTCMD} gcc &> /dev/null; then
-		echo "PASS"
+		echo "${PASS}"
 	else
 		echo "installing..."
-		${INSTALLCMD} gcc || fail "FAIL"
-		echo "PASS"
+		${INSTALLCMD} gcc || fail "${FAIL}"
+		echo "${PASS}"
 	fi
 
 	# test for virtualenv, and install it if necessary
 	echo -n "checking for ${PYTHON}-virtualenv package..."
 	if ${TESTCMD} ${PYTHON}-virtualenv &> /dev/null; then
-		echo "PASS"
+		echo "${PASS}"
 	else
 		echo "installing..."
-		${INSTALLCMD} ${PYTHON}-virtualenv || fail "FAIL"
-		echo "PASS"
+		${INSTALLCMD} ${PYTHON}-virtualenv || fail "${FAIL}"
+		echo "${PASS}"
 	fi
 
 	# test for directories, create if needed
 	echo -n "checking for directory ${MYBINPATH}..."
 	if [[ -d ${MYBINPATH} ]]; then
-		echo "PASS"
+		echo "${PASS}"
 	else
 		echo -n "creating..."
-		${SUDO} mkdir -p ${MYBINPATH} || fail "FAIL"
-		echo "PASS"
+		${SUDO} mkdir -p ${MYBINPATH} || fail "${FAIL}"
+		echo "${PASS}"
 	fi
 	echo -n "checking for directory ${MYENVPATH}..."
 	if [[ -d ${MYENVPATH} ]]; then
-		echo "PASS"
+		echo "${PASS}"
 	else
 		echo -n "creating..."
-		${SUDO} mkdir -p ${MYENVPATH} || fail "FAIL"
-		echo "PASS"
+		${SUDO} mkdir -p ${MYENVPATH} || fail "${FAIL}"
+		echo "${PASS}"
 	fi
 
 	# create isolated python environment
 	echo -n "creating isolated python environment ${MYINSTALLPATH}..."
-	${SUDO} ${VIRTUALENV} --no-site-packages ${MYINSTALLPATH} &> /dev/null && echo "PASS" || fail "FAIL"
+	${SUDO} ${VIRTUALENV} --no-site-packages ${MYINSTALLPATH} &> /dev/null && echo "${PASS}" || fail "${FAIL}"
 
 	# activate the virtual environment
 	echo -n "activating virutalenv ${MYINSTALLPATH}..."
-	. ${MYINSTALLPATH}/bin/activate || fail "FAIL\nfailed to activate virutalenv"
+	. ${MYINSTALLPATH}/bin/activate && echo "${PASS}" || fail "${FAIL}\nfailed to activate virutalenv"
 
 	# install pip packages
 	echo -n "installing rackspace-novaclient..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && echo "PASS" || fail "FAIL"
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && echo "${PASS}" || fail "${FAIL}"
 	echo -n "installing keyring..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade keyring &> /dev/null && echo "PASS" || fail "FAIL"
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade keyring &> /dev/null && echo "${PASS}" || fail "${FAIL}"
 	echo -n "installing supernova..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${SUPERNOVA} &> /dev/null && echo "PASS" || fail "FAIL"
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${SUPERNOVA} &> /dev/null && echo "${PASS}" || fail "${FAIL}"
 	echo -n "installing supernova-keyring-helper..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${HELPERADDON} &> /dev/null && echo "PASS" || fail "FAIL"
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${HELPERADDON} &> /dev/null && echo "${PASS}" || fail "${FAIL}"
 	echo -n "saving pip freeze output..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip freeze | ${SUDO} tee ${MYINSTALLPATH}/$(date +%F)-freeze.out &> /dev/null && echo "PASS" || fail "FAIL"
+	${SUDO} ${MYINSTALLPATH}/bin/pip freeze | ${SUDO} tee ${MYINSTALLPATH}/$(date +%F)-freeze.out &> /dev/null && echo "${PASS}" || fail "${FAIL}"
 
 	# deactivate the virtual environment
 	echo -n "deactivating virutalenv ${MYINSTALLPATH}..."
-	deactivate && echo "PASS" || fail "FAIL\nfailed to deactivate virutalenv"
+	deactivate && echo "${PASS}" || fail "${FAIL}\nfailed to deactivate virutalenv"
 
 	# create wrapper scripts
 	echo -n "creating wrapper scripts..."
@@ -179,7 +195,7 @@ do_install() {
 	${MYINSTALLPATH}/bin/supernova-keyring-helper \${@}
 	EOF
 	${SUDO} chmod +x ${MYBINPATH}/supernova-keyring-helper
-	echo "PASS"
+	echo "${PASS}"
 
 	# create config file template
 	echo -n "creating configuration template file ~/.supernova.sample ..."
@@ -194,7 +210,7 @@ do_install() {
 	OS_REGION_NAME=USE_KEYRING
 	NOVA_RAX_AUTH=1
 	EOF
-	echo "PASS"
+	echo "${PASS}"
 }
 
 
@@ -203,7 +219,7 @@ do_remove() {
 	if [[ -d ${MYINSTALLPATH} ]]; then
 		echo -n "remove virtualenv directory ${MYINSTALLPATH}? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			${SUDO} rm -rf ${MYINSTALLPATH} || fail "FAIL"
+			${SUDO} rm -rf ${MYINSTALLPATH} || fail "${FAIL}"
 		fi
 	fi
 
@@ -211,19 +227,19 @@ do_remove() {
 	if [[ -f ${MYBINPATH}/supernova ]]; then
 		echo -n "remove wrapper script ${MYBINPATH}/supernova? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			${SUDO} rm -f ${MYBINPATH}/supernova || fail "FAIL"
+			${SUDO} rm -f ${MYBINPATH}/supernova || fail "${FAIL}"
 		fi
 	fi
 	if [[ -f ${MYBINPATH}/supernova-keyring ]]; then
 		echo -n "remove wrapper script ${MYBINPATH}/supernova-keyring? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			${SUDO} rm -f ${MYBINPATH}/supernova-keyring || fail "FAIL"
+			${SUDO} rm -f ${MYBINPATH}/supernova-keyring || fail "${FAIL}"
 		fi
 	fi
 	if [[ -f ${MYBINPATH}/supernova-keyring-helper ]]; then
 		echo -n "remove wrapper script ${MYBINPATH}/supernova-keyring-helper? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			${SUDO} rm -f ${MYBINPATH}/supernova-keyring-helper || fail "FAIL"
+			${SUDO} rm -f ${MYBINPATH}/supernova-keyring-helper || fail "${FAIL}"
 		fi
 	fi
 
@@ -231,7 +247,7 @@ do_remove() {
 	if [[ -f ~/.supernova.sample ]]; then
 		echo -n "remove configuration template file ~/.supernova.sample? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			rm -f ~/.supernova.sample || fail "FAIL"
+			rm -f ~/.supernova.sample || fail "${FAIL}"
 		fi
 	fi
 
@@ -239,7 +255,7 @@ do_remove() {
 	if ${TESTCMD} ${PYTHON}-virtualenv &> /dev/null; then
 		echo -n "remove ${PYTHON}-virtualenv package? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			${REMOVECMD} ${PYTHON}-virtualenv || fail "FAIL"
+			${REMOVECMD} ${PYTHON}-virtualenv || fail "${FAIL}"
 		fi
 	fi
 
@@ -247,7 +263,7 @@ do_remove() {
 	if ${TESTCMD} gcc &> /dev/null; then
 		echo -n "remove gcc package? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			${REMOVECMD} gcc || fail "FAIL"
+			${REMOVECMD} gcc || fail "${FAIL}"
 		fi
 	fi
 
