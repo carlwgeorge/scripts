@@ -29,6 +29,7 @@ fail() {
 	exit 1
 }
 
+
 set_variables() {
 	# set the sudo variable
 	if [[ ${DOISUDO} == "yes" ]]; then
@@ -72,8 +73,6 @@ set_variables() {
 }
 
 
-
-
 do_install() {
 	# test if there already is scripts in our desired location
 	echo -n "checking for supernova wrapper script conflict..."
@@ -95,8 +94,18 @@ do_install() {
 		fail "FAIL\n${MYBINPATH}/supernova-keyring-helper already exists"
 	fi
 
-	# test for the package, and install it if necessary
-	echo -n "checking for package ${PYTHON}-virtualenv..."
+	# test for gcc, and install it if necessary
+	echo -n "checking for gcc package..."
+	if ${TESTCMD} gcc &> /dev/null; then
+		echo "PASS"
+	else
+		echo "installing..."
+		${INSTALLCMD} gcc || fail "FAIL"
+		echo "PASS"
+	fi
+
+	# test for virtualenv, and install it if necessary
+	echo -n "checking for ${PYTHON}-virtualenv package..."
 	if ${TESTCMD} ${PYTHON}-virtualenv &> /dev/null; then
 		echo "PASS"
 	else
@@ -180,6 +189,7 @@ do_install() {
 	echo "PASS"
 }
 
+
 do_remove() {
 	# remove installation path
 	if [[ -d ${MYINSTALLPATH} ]]; then
@@ -217,16 +227,25 @@ do_remove() {
 		fi
 	fi
 
-	# uninstall package
+	# uninstall virtualenv
 	if ${TESTCMD} ${PYTHON}-virtualenv &> /dev/null; then
-		echo -n "remove package ${PYTHON}-virtualenv? [y/N] "; read x
+		echo -n "remove ${PYTHON}-virtualenv package? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
 			${REMOVECMD} ${PYTHON}-virtualenv || fail "FAIL"
 		fi
 	fi
 
+	# uninstall gcc
+	if ${TESTCMD} gcc &> /dev/null; then
+		echo -n "remove gcc package? [y/N] "; read x
+		if [[ "${x}" == "y" ]]; then
+			${REMOVECMD} gcc || fail "FAIL"
+		fi
+	fi
+
 	echo "all uninstall checks completed"
 }
+
 
 do_help() {
 	echo -e "Description:\tBootstrap a complete supernova environment using virtualenv."
@@ -234,6 +253,7 @@ do_help() {
 	echo -e "Usage:\t\t${name} install"
 	echo -e "\t\t${name} remove"
 }
+
 
 # start main program
 
