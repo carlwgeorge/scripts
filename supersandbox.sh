@@ -194,7 +194,7 @@ do_install() {
 do_remove() {
 	# remove installation path
 	if [[ -d ${MYINSTALLPATH} ]]; then
-		echo -n "remove virtualenv directory ${_bld}${MYINSTALLPATH}? ${YESNO} "; read x
+		echo -n "remove virtualenv directory ${_bld}${MYINSTALLPATH}${_res}? ${YESNO} "; read x
 		if [[ "${x}" == "y" ]]; then
 			${SUDO} rm -rf ${MYINSTALLPATH} || fail
 		fi
