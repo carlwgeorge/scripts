@@ -194,41 +194,25 @@ do_install() {
 do_remove() {
 	# remove installation path
 	if [[ -d ${MYINSTALLPATH} ]]; then
-		echo -n "remove virtualenv directory ${MYINSTALLPATH}? ${YESNO} "; read x
+		echo -n "remove virtualenv directory ${_bld}${MYINSTALLPATH}? ${YESNO} "; read x
 		if [[ "${x}" == "y" ]]; then
 			${SUDO} rm -rf ${MYINSTALLPATH} || fail
 		fi
 	fi
 
 	# delete wrapper scripts
-	if [[ -f ${MYBINPATH}/nova ]]; then
-		echo -n "remove wrapper script ${MYBINPATH}/nova? ${YESNO} "; read x
-		if [[ "${x}" == "y" ]]; then
-			${SUDO} rm -f ${MYBINPATH}/nova || fail
+	for each in nova supernova supernova-keyring supernova-keyring-helper; do
+		if [[ -f ${MYBINPATH}/${each} ]]; then
+			echo -n "remove wrapper script ${_bld}${MYBINPATH}/${each}${_res}? ${YESNO} "; read x
+			if [[ "${x}" == "y" ]]; then
+				${SUDO} rm -f ${MYBINPATH}/${each} || fail
+			fi
 		fi
-	fi
-	if [[ -f ${MYBINPATH}/supernova ]]; then
-		echo -n "remove wrapper script ${MYBINPATH}/supernova? ${YESNO} "; read x
-		if [[ "${x}" == "y" ]]; then
-			${SUDO} rm -f ${MYBINPATH}/supernova || fail
-		fi
-	fi
-	if [[ -f ${MYBINPATH}/supernova-keyring ]]; then
-		echo -n "remove wrapper script ${MYBINPATH}/supernova-keyring? ${YESNO} "; read x
-		if [[ "${x}" == "y" ]]; then
-			${SUDO} rm -f ${MYBINPATH}/supernova-keyring || fail
-		fi
-	fi
-	if [[ -f ${MYBINPATH}/supernova-keyring-helper ]]; then
-		echo -n "remove wrapper script ${MYBINPATH}/supernova-keyring-helper? ${YESNO} "; read x
-		if [[ "${x}" == "y" ]]; then
-			${SUDO} rm -f ${MYBINPATH}/supernova-keyring-helper || fail
-		fi
-	fi
+	done
 
 	# remove config file template
 	if [[ -f ~/.supernova.sample ]]; then
-		echo -n "remove configuration template file ~/.supernova.sample? ${YESNO} "; read x
+		echo -n "remove configuration template file ${_bld}~/.supernova.sample${_res}? ${YESNO} "; read x
 		if [[ "${x}" == "y" ]]; then
 			rm -f ~/.supernova.sample || fail
 		fi
