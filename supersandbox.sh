@@ -134,19 +134,27 @@ do_install() {
 
 	# create isolated python environment
 	echo -n "creating isolated python environment ${MYINSTALLPATH}..."
-	${SUDO} ${VIRTUALENV} --no-site-packages ${MYINSTALLPATH} &> /dev/null || fail "FAIL"
-	echo "PASS"
+	${SUDO} ${VIRTUALENV} --no-site-packages ${MYINSTALLPATH} &> /dev/null && echo "PASS" || fail "FAIL"
 
-	# activate the virtual environment and install pip packages
-	echo -n "installing pip packages inside ${MYINSTALLPATH}..."
-	. ${MYINSTALLPATH}/bin/activate
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null || fail "FAIL\nfailed to install rackspace-novaclient"
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade keyring &> /dev/null || fail "FAIL\nfailed to install keyring"
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${SUPERNOVA} &> /dev/null || fail "FAIL\nfailed to install ${SUPERNOVA}"
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${HELPERADDON} &> /dev/null || fail "FAIL\nfailed to install ${HELPERADDON}"
-	${SUDO} ${MYINSTALLPATH}/bin/pip freeze | ${SUDO} tee ${MYINSTALLPATH}/$(date +%F)-freeze.out &> /dev/null
-	deactivate
-	echo "PASS"
+	# activate the virtual environment
+	echo -n "activating virutalenv ${MYINSTALLPATH}..."
+	. ${MYINSTALLPATH}/bin/activate || fail "FAIL\nfailed to activate virutalenv"
+
+	# install pip packages
+	echo -n "installing rackspace-novaclient..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && echo "PASS" || fail "FAIL"
+	echo -n "installing keyring..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade keyring &> /dev/null && echo "PASS" || fail "FAIL"
+	echo -n "installing supernova..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${SUPERNOVA} &> /dev/null && echo "PASS" || fail "FAIL"
+	echo -n "installing supernova-keyring-helper..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${HELPERADDON} &> /dev/null && echo "PASS" || fail "FAIL"
+	echo -n "saving pip freeze output..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip freeze | ${SUDO} tee ${MYINSTALLPATH}/$(date +%F)-freeze.out &> /dev/null && echo "PASS" || fail "FAIL"
+
+	# deactivate the virtual environment
+	echo -n "deactivating virutalenv ${MYINSTALLPATH}..."
+	deactivate && echo "PASS" || fail "FAIL\nfailed to deactivate virutalenv"
 
 	# create wrapper scripts
 	echo -n "creating wrapper scripts..."
