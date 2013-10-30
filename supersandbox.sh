@@ -90,6 +90,22 @@ set_variables() {
 }
 
 
+pkg_test() {
+	# https://bugs.launchpad.net/pbr/+bug/1245676
+	# once this bug is fixed, remove git as a dependency check
+
+	# test if packages are installed
+	for pkg in ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv gcc make git; do
+		echo -n "checking for ${pkg} package..."
+		if ${TESTCMD} ${pkg} &> /dev/null; then
+			pass
+		else
+			fail "install ${pkg} and try again"
+		fi
+	done
+}
+
+
 do_install() {
 	# test if there already is scripts in our desired location
 	echo -n "checking for supernova wrapper script conflict..."
@@ -111,17 +127,8 @@ do_install() {
 		fail "${MYBINPATH}/supernova-keyring-helper already exists"
 	fi
 
-	# https://bugs.launchpad.net/pbr/+bug/1245676
-	# once this bug is fixed, remove git as a dependency check
-	# test for packages
-	for pkg in ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv gcc make git; do
-		echo -n "checking for ${pkg} package..."
-		if ${TESTCMD} ${pkg} &> /dev/null; then
-			pass
-		else
-			fail "install ${pkg} and try again"
-		fi
-	done
+	# test if packages are installed
+	pkg_test
 
 	# test for directories, create if needed
 	echo -n "checking for directory ${MYBINPATH}..."
@@ -201,6 +208,9 @@ do_install() {
 
 
 do_upgrade() {
+	# test if packages are installed
+	pkg_test
+
 	# activate the virtual environment
 	echo -n "activating virutalenv ${MYINSTALLPATH}..."
 	. ${MYINSTALLPATH}/bin/activate && pass || fail
