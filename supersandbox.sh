@@ -248,6 +248,7 @@ do_remove() {
 	if [[ -d ${MYINSTALLPATH} ]]; then
 		echo -n "remove virtualenv directory ${_bld}${MYINSTALLPATH}${_res}? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
+			echo -n "removing virtualenv directory..."
 			${SUDO} rm -rf ${MYINSTALLPATH} && pass || fail
 		fi
 	fi
@@ -257,6 +258,7 @@ do_remove() {
 		if [[ -f ${MYBINPATH}/${each} ]]; then
 			echo -n "remove wrapper script ${_bld}${MYBINPATH}/${each}${_res}? [y/N] "; read x
 			if [[ "${x}" == "y" ]]; then
+				echo -n "removing wrapper script..."
 				${SUDO} rm -f ${MYBINPATH}/${each} && pass || fail
 			fi
 		fi
@@ -266,6 +268,7 @@ do_remove() {
 	if [[ -f ~/.supernova.sample ]]; then
 		echo -n "remove configuration template file ${_bld}~/.supernova.sample${_res}? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
+			echo -n "removing configuration template file..."
 			rm -f ~/.supernova.sample && pass || fail
 		fi
 	fi
