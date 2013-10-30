@@ -14,6 +14,10 @@ DOISUDO="yes"
 # name of the virtualenv
 MYINSTALLPATH="${MYENVPATH}/supernova"
 
+# which version of pbr do you want?  
+PBR="pbr==0.5.21" # 0.5.21 from pypi
+#PBR="pbr" # latest 0.5.22 from pypi is currently buggy
+
 # which version of supernova do you want?  uncomment only one.
 SUPERNOVA="https://github.com/major/supernova/archive/v0.7.5.tar.gz" # 0.7.5 from github
 #SUPERNOVA="supernova" # 0.7.4 from pypi
@@ -62,21 +66,25 @@ set_variables() {
 	if [[ -f /etc/arch-release ]]; then
 		OSNAME="arch"
 		PYTHON="python2"
+		PYTHONDEV="python2"
 		VIRTUALENV="virtualenv2"
 		TESTCMD="pacman -Q"
 	elif [[ -f /etc/debian_version ]]; then
 		OSNAME="debian"
 		PYTHON="python"
+		PYTHONDEV="python-dev"
 		VIRTUALENV="virtualenv"
 		TESTCMD="dpkg -s"
 	elif [[ -f /etc/fedora-release ]]; then
 		OSNAME="fedora"
 		PYTHON="python"
+		PYTHONDEV="python-devel"
 		VIRTUALENV="virtualenv"
 		TESTCMD="rpm -q"
 	elif [[ -f /etc/redhat-release ]]; then
 		OSNAME="redhat"
 		PYTHON="python27"
+		PYTHONDEV="python27-devel"
 		VIRTUALENV="virtualenv-2.7"
 		TESTCMD="rpm -q"
 	else
@@ -107,7 +115,7 @@ do_install() {
 	fi
 
 	# test for packages
-	for pkg in gcc make ${PYTHON}-virtualenv; do
+	for pkg in gcc make ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv; do
 		echo -n "checking for ${pkg} package..."
 		if ${TESTCMD} ${pkg} &> /dev/null; then
 			echo "${PASS}"
@@ -143,6 +151,8 @@ do_install() {
 	. ${MYINSTALLPATH}/bin/activate && echo "${PASS}" || fail
 
 	# install pip packages
+	echo -n "installing pbr..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${PBR} &> /dev/null && echo "${PASS}" || fail
 	echo -n "installing python-novaclient..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade python-novaclient &> /dev/null && echo "${PASS}" || fail
 	echo -n "installing rackspace-novaclient..."
