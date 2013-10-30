@@ -60,32 +60,52 @@ set_variables() {
 	fi
 
 	# OS detection
-	if [[ -f /etc/arch-release ]]; then
-		OSNAME="arch"
+	if [[ -f /etc/os-release ]]; then
+		eval $(grep ^ID= /etc/os-release)
+		# works on ubuntu, debian, arch, fedora
+	elif [[ -f /etc/redhat-release ]]; then
+		if [[ -f /etc/fedora-release ]]; then
+			ID="fedora"
+		elif [[ -f /etc/centos-release ]]; then
+			ID="centos"
+		else
+			ID="redhat"
+		fi
+	fi
+
+	# set variables based on OS
+	if [[ "${ID}" == "arch" ]]; then
 		PYTHON="python2"
 		PYTHONDEV="python2"
 		VIRTUALENV="virtualenv2"
 		TESTCMD="pacman -Q"
-	elif [[ -f /etc/debian_version ]]; then
-		OSNAME="debian"
+	elif [[ "${ID}" == "debian" ]]; then
 		PYTHON="python"
 		PYTHONDEV="python-dev"
 		VIRTUALENV="virtualenv"
 		TESTCMD="dpkg -s"
-	elif [[ -f /etc/fedora-release ]]; then
-		OSNAME="fedora"
+	elif [[ "${ID}" == "ubuntu" ]]; then
+		PYTHON="python"
+		PYTHONDEV="python-dev"
+		VIRTUALENV="virtualenv"
+		TESTCMD="dpkg -s"
+	elif [[ "${ID}" == "fedora" ]]; then
 		PYTHON="python"
 		PYTHONDEV="python-devel"
 		VIRTUALENV="virtualenv"
 		TESTCMD="rpm -q"
-	elif [[ -f /etc/redhat-release ]]; then
-		OSNAME="redhat"
+	elif [[ "${ID}" == "centos" ]]; then
+		PYTHON="python27"
+		PYTHONDEV="python27-devel"
+		VIRTUALENV="virtualenv-2.7"
+		TESTCMD="rpm -q"
+	elif [[ "${ID}" == "redhat" ]]; then
 		PYTHON="python27"
 		PYTHONDEV="python27-devel"
 		VIRTUALENV="virtualenv-2.7"
 		TESTCMD="rpm -q"
 	else
-		fail "unrecognized OS"
+		fail "unrecognized OS: ${ID}"
 	fi
 }
 
