@@ -14,10 +14,6 @@ DOISUDO="yes"
 # name of the virtualenv
 MYINSTALLPATH="${MYENVPATH}/supernova"
 
-# which version of pbr do you want?  
-PBR="pbr==0.5.21" # 0.5.21 from pypi
-#PBR="pbr" # latest 0.5.22 from pypi is currently buggy
-
 # which version of supernova do you want?  uncomment only one.
 SUPERNOVA="https://github.com/major/supernova/archive/v0.7.5.tar.gz" # 0.7.5 from github
 #SUPERNOVA="supernova" # 0.7.4 from pypi
@@ -115,8 +111,10 @@ do_install() {
 		fail "${MYBINPATH}/supernova-keyring-helper already exists"
 	fi
 
+	# https://bugs.launchpad.net/pbr/+bug/1245676
+	# once this bug is fixed, remove git as a dependency check
 	# test for packages
-	for pkg in ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv gcc make; do
+	for pkg in ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv gcc make git; do
 		echo -n "checking for ${pkg} package..."
 		if ${TESTCMD} ${pkg} &> /dev/null; then
 			pass
@@ -153,7 +151,7 @@ do_install() {
 
 	# install pip packages
 	echo -n "installing pbr..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install ${PBR} &> /dev/null && pass || fail
+	${SUDO} ${MYINSTALLPATH}/bin/pip install pbr &> /dev/null && pass || fail
 	echo -n "installing python-novaclient..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install python-novaclient &> /dev/null && pass || fail
 	echo -n "installing rackspace-novaclient..."
