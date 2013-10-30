@@ -44,8 +44,7 @@ PASS="${_bld}${_gre}PASS${_res}"
 FAIL="${_bld}${_red}FAIL${_res}"
 DESC="${_bld}Description${_res}"
 USAGE="${_bld}Usage${_res}"
-YESNO="[${_bld}${_gre}PASS${_res}]"
-YESNO="[${_bld}${_gre}y${_res}/${_bld}${_red}N${_res}]"
+YESNO="[y/N]"
 
 fail() {
 	# this function is for quitters!
@@ -204,27 +203,27 @@ do_install() {
 do_remove() {
 	# remove installation path
 	if [[ -d ${MYINSTALLPATH} ]]; then
-		echo -n "remove virtualenv directory ${_bld}${MYINSTALLPATH}${_res}? ${YESNO} "; read x
+		echo -n "remove virtualenv directory ${_bld}${MYINSTALLPATH}${_res}? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			${SUDO} rm -rf ${MYINSTALLPATH} || fail
+			${SUDO} rm -rf ${MYINSTALLPATH} && echo "${PASS}" || fail
 		fi
 	fi
 
 	# delete wrapper scripts
 	for each in nova supernova supernova-keyring supernova-keyring-helper; do
 		if [[ -f ${MYBINPATH}/${each} ]]; then
-			echo -n "remove wrapper script ${_bld}${MYBINPATH}/${each}${_res}? ${YESNO} "; read x
+			echo -n "remove wrapper script ${_bld}${MYBINPATH}/${each}${_res}? [y/N] "; read x
 			if [[ "${x}" == "y" ]]; then
-				${SUDO} rm -f ${MYBINPATH}/${each} || fail
+				${SUDO} rm -f ${MYBINPATH}/${each} && echo "${PASS}" || fail
 			fi
 		fi
 	done
 
 	# remove config file template
 	if [[ -f ~/.supernova.sample ]]; then
-		echo -n "remove configuration template file ${_bld}~/.supernova.sample${_res}? ${YESNO} "; read x
+		echo -n "remove configuration template file ${_bld}~/.supernova.sample${_res}? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			rm -f ~/.supernova.sample || fail
+			rm -f ~/.supernova.sample && echo "${PASS}" || fail
 		fi
 	fi
 
