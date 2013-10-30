@@ -106,6 +106,24 @@ pkg_test() {
 }
 
 
+do_template() {
+	# create config file template
+	echo -n "creating configuration template file ~/.supernova.sample ..."
+	cat <<- EOF | tee ~/.supernova.sample &> /dev/null
+	[mine]
+	OS_AUTH_SYSTEM=rackspace
+	OS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/
+	OS_TENANT_NAME=USE_KEYRING
+	OS_PROJECT_ID=USE_KEYRING
+	OS_USERNAME=USE_KEYRING
+	OS_PASSWORD=USE_KEYRING
+	OS_REGION_NAME=USE_KEYRING
+	NOVA_RAX_AUTH=1
+	EOF
+	pass
+}
+
+
 do_install() {
 	# test if there already is scripts in our desired location
 	echo -n "checking for supernova wrapper script conflict..."
@@ -189,19 +207,7 @@ do_install() {
 	pass
 
 	# create config file template
-	echo -n "creating configuration template file ~/.supernova.sample ..."
-	cat <<- EOF | tee ~/.supernova.sample &> /dev/null
-	[mine]
-	OS_AUTH_SYSTEM=rackspace
-	OS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/
-	OS_TENANT_NAME=USE_KEYRING
-	OS_PROJECT_ID=USE_KEYRING
-	OS_USERNAME=USE_KEYRING
-	OS_PASSWORD=USE_KEYRING
-	OS_REGION_NAME=USE_KEYRING
-	NOVA_RAX_AUTH=1
-	EOF
-	pass
+	do_template
 
 	echo "${_bld}installation complete${_res}"
 }
@@ -269,13 +275,18 @@ do_remove() {
 
 
 do_help() {
-	DESC="${_bld}Description${_res}"
-	USAGE="${_bld}Usage${_res}"
-	echo -e "${DESC}:\tBootstrap a complete supernova environment using virtualenv."
-	name=$(basename ${0})
-	echo -e "${USAGE}:\t\t${name} install"
-	echo -e "\t\t${name} upgrade"
-	echo -e "\t\t${name} remove"
+	DESC="${_bld}description${_res}"
+	USAGE="${_bld}usage${_res}"
+	SUBCOMMAND="${_und}subcommand${_res}"
+	SUBCOMMANDS="${_bld}subcommands${_res}"
+	NAME=$(basename ${0})
+	echo -e "${USAGE}:\t\t${NAME} ${SUBCOMMAND}\n"
+	echo -e "${DESC}:\tBootstrap a complete supernova environment using virtualenv.\n"
+	echo -e "${SUBCOMMANDS}:\tinstall \tinstall the environment and wrapper scripts"
+	echo -e "\t\tupgrade  \tupgrade the pip pacakges in the environment"
+	echo -e "\t\tremove   \tremove the environment and wrapper scripts"
+	echo -e "\t\ttemplate \tcreate configuration template file"
+	exit 0
 }
 
 
@@ -288,8 +299,9 @@ fi
 set_variables
 
 case ${1} in
-	"remove"|"erase"|"purge")	do_remove;;
 	"install")			do_install;;
 	"upgrade"|"update")		do_upgrade;;
+	"remove"|"erase"|"purge")	do_remove;;
+	"template")			do_template;;
 	*)				do_help;;
 esac
