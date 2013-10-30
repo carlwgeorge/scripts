@@ -266,6 +266,7 @@ do_help() {
 	echo -e "${DESC}:\tBootstrap a complete supernova environment using virtualenv."
 	name=$(basename ${0})
 	echo -e "${USAGE}:\t\t${name} install"
+	echo -e "\t\t${name} upgrade"
 	echo -e "\t\t${name} remove"
 }
 
