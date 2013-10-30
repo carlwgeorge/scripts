@@ -40,15 +40,17 @@ _wht=$(tput setaf 7) # white
 _res=$(tput sgr0)    # reset
 # echo -e "${_bld}${_red}Usage example.${_res}"
 
-PASS="${_bld}${_gre}PASS${_res}"
-FAIL="${_bld}${_red}FAIL${_res}"
-DESC="${_bld}Description${_res}"
-USAGE="${_bld}Usage${_res}"
-YESNO="[y/N]"
+pass() {
+	# print the word PASS in bold green
+	echo -e "${_bld}${_gre}PASS${_res}"
+}
+
 
 fail() {
-	# this function is for quitters!
-	echo -e "${FAIL}\n${_bld}${@}${_res}"
+	# print the word FAIL in bold red
+	# print any additional text in bold
+	# exit the script
+	echo -e "${_bld}${_red}FAIL${_res}\n${_bld}${@}${_res}"
 	exit 1
 }
 
@@ -96,19 +98,19 @@ do_install() {
 	# test if there already is scripts in our desired location
 	echo -n "checking for supernova wrapper script conflict..."
 	if [[ ! -f ${MYBINPATH}/supernova ]]; then
-		echo "${PASS}"
+		pass
 	else
 		fail "${MYBINPATH}/supernova already exists"
 	fi
 	echo -n "checking for supernova-keyring wrapper script conflict..."
 	if [[ ! -f ${MYBINPATH}/supernova-keyring ]]; then
-		echo "${PASS}"
+		pass
 	else
 		fail "${MYBINPATH}/supernova-keyring already exists"
 	fi
 	echo -n "checking for supernova-keyring-helper wrapper script conflict..."
 	if [[ ! -f ${MYBINPATH}/supernova-keyring-helper ]]; then
-		echo "${PASS}"
+		pass
 	else
 		fail "${MYBINPATH}/supernova-keyring-helper already exists"
 	fi
@@ -117,7 +119,7 @@ do_install() {
 	for pkg in gcc make ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv; do
 		echo -n "checking for ${pkg} package..."
 		if ${TESTCMD} ${pkg} &> /dev/null; then
-			echo "${PASS}"
+			pass
 		else
 			fail "install ${pkg} before running this script"
 		fi
@@ -126,48 +128,48 @@ do_install() {
 	# test for directories, create if needed
 	echo -n "checking for directory ${MYBINPATH}..."
 	if [[ -d ${MYBINPATH} ]]; then
-		echo "${PASS}"
+		pass
 	else
 		echo -n "creating..."
 		${SUDO} mkdir -p ${MYBINPATH} || fail
-		echo "${PASS}"
+		pass
 	fi
 	echo -n "checking for directory ${MYENVPATH}..."
 	if [[ -d ${MYENVPATH} ]]; then
-		echo "${PASS}"
+		pass
 	else
 		echo -n "creating..."
 		${SUDO} mkdir -p ${MYENVPATH} || fail
-		echo "${PASS}"
+		pass
 	fi
 
 	# create isolated python environment
 	echo -n "creating isolated python environment ${MYINSTALLPATH}..."
-	${SUDO} ${VIRTUALENV} --no-site-packages ${MYINSTALLPATH} &> /dev/null && echo "${PASS}" || fail
+	${SUDO} ${VIRTUALENV} --no-site-packages ${MYINSTALLPATH} &> /dev/null && pass || fail
 
 	# activate the virtual environment
 	echo -n "activating virutalenv ${MYINSTALLPATH}..."
-	. ${MYINSTALLPATH}/bin/activate && echo "${PASS}" || fail
+	. ${MYINSTALLPATH}/bin/activate && pass || fail
 
 	# install pip packages
 	echo -n "installing pbr..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${PBR} &> /dev/null && echo "${PASS}" || fail
+	${SUDO} ${MYINSTALLPATH}/bin/pip install ${PBR} &> /dev/null && pass || fail
 	echo -n "installing python-novaclient..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade python-novaclient &> /dev/null && echo "${PASS}" || fail
+	${SUDO} ${MYINSTALLPATH}/bin/pip install python-novaclient &> /dev/null && pass || fail
 	echo -n "installing rackspace-novaclient..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && echo "${PASS}" || fail
+	${SUDO} ${MYINSTALLPATH}/bin/pip install rackspace-novaclient &> /dev/null && pass || fail
 	echo -n "installing keyring..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade keyring &> /dev/null && echo "${PASS}" || fail
+	${SUDO} ${MYINSTALLPATH}/bin/pip install keyring &> /dev/null && pass || fail
 	echo -n "installing supernova..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${SUPERNOVA} &> /dev/null && echo "${PASS}" || fail
+	${SUDO} ${MYINSTALLPATH}/bin/pip install ${SUPERNOVA} &> /dev/null && pass || fail
 	echo -n "installing supernova-keyring-helper..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${HELPERADDON} &> /dev/null && echo "${PASS}" || fail
+	${SUDO} ${MYINSTALLPATH}/bin/pip install ${HELPERADDON} &> /dev/null && pass || fail
 	echo -n "saving pip freeze output..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip freeze | ${SUDO} tee ${MYINSTALLPATH}/$(date +%F)-freeze.out &> /dev/null && echo "${PASS}" || fail
+	${SUDO} ${MYINSTALLPATH}/bin/pip freeze | ${SUDO} tee ${MYINSTALLPATH}/$(date +%F)-freeze.out &> /dev/null && pass || fail
 
 	# deactivate the virtual environment
 	echo -n "deactivating virutalenv ${MYINSTALLPATH}..."
-	deactivate && echo "${PASS}" || fail
+	deactivate && pass || fail
 
 	# create wrapper scripts
 	echo -n "creating wrapper scripts..."
@@ -179,7 +181,7 @@ do_install() {
 		EOF
 		${SUDO} chmod +x ${MYBINPATH}/${each}
 	done
-	echo "${PASS}"
+	pass
 
 	# create config file template
 	echo -n "creating configuration template file ~/.supernova.sample ..."
@@ -194,9 +196,36 @@ do_install() {
 	OS_REGION_NAME=USE_KEYRING
 	NOVA_RAX_AUTH=1
 	EOF
-	echo "${PASS}"
+	pass
 
 	echo "${_bld}installation complete${_res}"
+}
+
+
+do_upgrade() {
+	# activate the virtual environment
+	echo -n "activating virutalenv ${MYINSTALLPATH}..."
+	. ${MYINSTALLPATH}/bin/activate && pass || fail
+
+	# upgrade pip packages
+	echo -n "updating pbr..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade pbr &> /dev/null && pass || fail
+	echo -n "updating python-novaclient..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade python-novaclient &> /dev/null && pass || fail
+	echo -n "updating rackspace-novaclient..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && pass || fail
+	echo -n "updating keyring..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade keyring &> /dev/null && pass || fail
+	echo -n "updating supernova..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade supernova &> /dev/null && pass || fail
+	echo -n "updating supernova-keyring-helper..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${HELPERADDON} &> /dev/null && pass || fail
+	echo -n "saving pip freeze output..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip freeze | ${SUDO} tee ${MYINSTALLPATH}/freeze.$(date +%F).out &> /dev/null && pass || fail
+
+	# deactivate the virtual environment
+	echo -n "deactivating virutalenv ${MYINSTALLPATH}..."
+	deactivate && pass || fail
 }
 
 
@@ -205,7 +234,7 @@ do_remove() {
 	if [[ -d ${MYINSTALLPATH} ]]; then
 		echo -n "remove virtualenv directory ${_bld}${MYINSTALLPATH}${_res}? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			${SUDO} rm -rf ${MYINSTALLPATH} && echo "${PASS}" || fail
+			${SUDO} rm -rf ${MYINSTALLPATH} && pass || fail
 		fi
 	fi
 
@@ -214,7 +243,7 @@ do_remove() {
 		if [[ -f ${MYBINPATH}/${each} ]]; then
 			echo -n "remove wrapper script ${_bld}${MYBINPATH}/${each}${_res}? [y/N] "; read x
 			if [[ "${x}" == "y" ]]; then
-				${SUDO} rm -f ${MYBINPATH}/${each} && echo "${PASS}" || fail
+				${SUDO} rm -f ${MYBINPATH}/${each} && pass || fail
 			fi
 		fi
 	done
@@ -223,7 +252,7 @@ do_remove() {
 	if [[ -f ~/.supernova.sample ]]; then
 		echo -n "remove configuration template file ${_bld}~/.supernova.sample${_res}? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
-			rm -f ~/.supernova.sample && echo "${PASS}" || fail
+			rm -f ~/.supernova.sample && pass || fail
 		fi
 	fi
 
@@ -232,6 +261,8 @@ do_remove() {
 
 
 do_help() {
+	DESC="${_bld}Description${_res}"
+	USAGE="${_bld}Usage${_res}"
 	echo -e "${DESC}:\tBootstrap a complete supernova environment using virtualenv."
 	name=$(basename ${0})
 	echo -e "${USAGE}:\t\t${name} install"
@@ -246,5 +277,6 @@ set_variables
 case ${1} in
 	"remove"|"erase"|"purge")	do_remove;;
 	"install")			do_install;;
+	"upgrade"|"update")		do_upgrade;;
 	*)				do_help;;
 esac
