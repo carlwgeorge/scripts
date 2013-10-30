@@ -116,12 +116,12 @@ do_install() {
 	fi
 
 	# test for packages
-	for pkg in gcc make ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv; do
+	for pkg in ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv gcc make; do
 		echo -n "checking for ${pkg} package..."
 		if ${TESTCMD} ${pkg} &> /dev/null; then
 			pass
 		else
-			fail "install ${pkg} before running this script"
+			fail "install ${pkg} and try again"
 		fi
 	done
 
