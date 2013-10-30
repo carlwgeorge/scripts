@@ -271,6 +271,10 @@ do_help() {
 
 # start main program
 
+if [[ ${#} -ne 1 ]]; then
+	do_help
+fi
+
 set_variables
 
 case ${1} in
