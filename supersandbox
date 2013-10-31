@@ -31,9 +31,7 @@ pass() {
 
 
 fail() {
-	# print the word FAIL in bold red
-	# print any additional text in bold
-	# exit the script
+	# print a red FAIL and any additional text
 	echo -e "${_bld}${_red}FAIL${_res}\n${_bld}${@}${_res}"
 	exit 1
 }
