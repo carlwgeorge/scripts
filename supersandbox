@@ -97,11 +97,8 @@ set_variables() {
 
 
 pkg_test() {
-	# https://bugs.launchpad.net/pbr/+bug/1245676
-	# once this bug is fixed, remove git as a dependency check
-
 	# test if packages are installed
-	for pkg in ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv gcc make git; do
+	for pkg in ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv gcc; do
 		echo -n "checking for ${pkg} package..."
 		if ${TESTCMD} ${pkg} &> /dev/null; then
 			pass
@@ -181,14 +178,10 @@ do_install() {
 	. ${MYINSTALLPATH}/bin/activate && pass || fail
 
 	# install pip packages
-	echo -n "installing pbr..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install pbr &> /dev/null && pass || fail
 	echo -n "installing python-novaclient..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install python-novaclient &> /dev/null && pass || fail
 	echo -n "installing rackspace-novaclient..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install rackspace-novaclient &> /dev/null && pass || fail
-	echo -n "installing keyring..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install keyring &> /dev/null && pass || fail
 	echo -n "installing supernova..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install ${SUPERNOVA} &> /dev/null && pass || fail
 	echo -n "installing supernova-keyring-helper..."
