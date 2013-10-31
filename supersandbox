@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#################### user defined variables ################
-
 # path for final wrapper scripts
 MYBINPATH="/usr/local/bin"
 
@@ -14,14 +12,9 @@ DOISUDO="yes"
 # name of the virtualenv
 MYINSTALLPATH="${MYENVPATH}/supernova"
 
-# which version of supernova do you want?  uncomment only one.
-SUPERNOVA="https://github.com/major/supernova/archive/v0.7.5.tar.gz" # 0.7.5 from github
-#SUPERNOVA="supernova" # 0.7.4 from pypi
-
-# supernova-keyring addon
+# direct links to some python packages
+SUPERNOVA="https://github.com/major/supernova/archive/v0.7.5.tar.gz"
 HELPERADDON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.3.tar.gz"
-
-############################################################
 
 # text formatting
 _und=$(tput sgr 0 1) # underline
