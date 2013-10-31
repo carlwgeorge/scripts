@@ -128,6 +128,9 @@ do_template() {
 
 
 do_install() {
+	# test if packages are installed
+	pkg_test
+
 	# test if there already is scripts in our desired location
 	echo -n "checking for wrapper script conflict..."
 	for each in nova supernova supernova-keyring supernova-keyring-helper; do
@@ -136,9 +139,6 @@ do_install() {
 		fi
 	done
 	pass
-
-	# test if packages are installed
-	pkg_test
 
 	# test for directories, create if needed
 	echo -n "checking for directory ${MYBINPATH}..."
