@@ -21,13 +21,8 @@ _und=$(tput sgr 0 1) # underline
 _bld=$(tput bold)    # bold
 _red=$(tput setaf 1) # red
 _gre=$(tput setaf 2) # green
-_yel=$(tput setaf 3) # yellow
-_blu=$(tput setaf 4) # blue
-_pur=$(tput setaf 5) # purple
-_cya=$(tput setaf 6) # cyan
-_wht=$(tput setaf 7) # white
 _res=$(tput sgr0)    # reset
-# echo -e "${_bld}${_red}Usage example.${_res}"
+
 
 pass() {
 	# print the word PASS in bold green
