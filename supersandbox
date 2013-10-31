@@ -277,7 +277,7 @@ do_help() {
 	echo -e "\t\tupgrade  \tupgrade the pip pacakges in the environment"
 	echo -e "\t\tremove   \tremove the environment and wrapper scripts"
 	echo -e "\t\ttemplate \tcreate configuration template file"
-	exit 0
+	exit 1
 }
 
 
