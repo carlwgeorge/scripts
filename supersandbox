@@ -328,3 +328,5 @@ case ${1} in
 	"template")			do_template;;
 	*)				do_help;;
 esac
+
+# vim: set syntax=sh sw=8 ts=8 :
