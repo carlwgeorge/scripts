@@ -129,24 +129,13 @@ do_template() {
 
 do_install() {
 	# test if there already is scripts in our desired location
-	echo -n "checking for supernova wrapper script conflict..."
-	if [[ ! -f ${MYBINPATH}/supernova ]]; then
-		pass
-	else
-		fail "${MYBINPATH}/supernova already exists"
-	fi
-	echo -n "checking for supernova-keyring wrapper script conflict..."
-	if [[ ! -f ${MYBINPATH}/supernova-keyring ]]; then
-		pass
-	else
-		fail "${MYBINPATH}/supernova-keyring already exists"
-	fi
-	echo -n "checking for supernova-keyring-helper wrapper script conflict..."
-	if [[ ! -f ${MYBINPATH}/supernova-keyring-helper ]]; then
-		pass
-	else
-		fail "${MYBINPATH}/supernova-keyring-helper already exists"
-	fi
+	echo -n "checking for wrapper script conflict..."
+	for each in nova supernova supernova-keyring supernova-keyring-helper; do
+		if [[ -f ${MYBINPATH}/${each} ]]; then
+			fail "${MYBINPATH}/${each} already exists"
+		fi
+	done
+	pass
 
 	# test if packages are installed
 	pkg_test
