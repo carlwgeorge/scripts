@@ -298,3 +298,4 @@ case ${1} in
 esac
 
 # vim: set syntax=sh sw=8 ts=8 :
+## ## ## ## ## ## GitHub highlight hack
