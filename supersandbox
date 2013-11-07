@@ -14,7 +14,7 @@ MYINSTALLPATH="${MYENVPATH}/supernova"
 
 # direct links to some python packages
 SUPERNOVA="https://github.com/major/supernova/archive/v0.7.5.tar.gz"
-HELPERADDON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.3.tar.gz"
+HELPERADDON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.4.tar.gz"
 
 # text formatting
 _und=$(tput sgr 0 1) # underline
