@@ -12,8 +12,7 @@ DOISUDO="yes"
 # name of the virtualenv
 MYINSTALLPATH="${MYENVPATH}/supernova"
 
-# direct links to some python packages
-SUPERNOVA="https://github.com/major/supernova/archive/v0.7.5.tar.gz"
+# direct links
 HELPERADDON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.4.tar.gz"
 
 # text formatting
@@ -172,7 +171,7 @@ do_install() {
 	echo -n "installing rackspace-novaclient..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install rackspace-novaclient &> /dev/null && pass || fail
 	echo -n "installing supernova..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install ${SUPERNOVA} &> /dev/null && pass || fail
+	${SUDO} ${MYINSTALLPATH}/bin/pip install supernova &> /dev/null && pass || fail
 	echo -n "installing supernova-keyring-helper..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install ${HELPERADDON} &> /dev/null && pass || fail
 	echo -n "saving pip freeze output..."
