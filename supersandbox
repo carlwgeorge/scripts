@@ -266,6 +266,26 @@ do_remove() {
 }
 
 
+do_status() {
+	echo -e "DEFAULT SUPERNOVA:\n$(which supernova)\n"
+
+	echo "ALL SUPERNOVAS IN PATH:"
+	IFS=':'
+	for each in ${PATH}; do
+		find ${each} -name supernova -type f -executable
+	done
+	unset IFS
+	echo
+
+	echo "POSSIBLE SUPERNOVA VIRTUALENVS"
+	for each in /usr/local /opt ${HOME}; do
+		for dir in $(find ${each} -iname *virt*env* -type d); do
+			find ${dir} -name supernova -type d | grep -v site-packages
+		done
+	done
+}
+
+
 do_help() {
 	DESC="${_bld}description${_res}"
 	USAGE="${_bld}usage${_res}"
@@ -278,6 +298,7 @@ do_help() {
 	echo -e "\t\tupgrade  \tupgrade the pip pacakges in the environment"
 	echo -e "\t\tremove   \tremove the environment and wrapper scripts"
 	echo -e "\t\ttemplate \tcreate configuration template file"
+	echo -e "\t\tstatus   \tdetect configuration details"
 	exit 1
 }
 
@@ -295,6 +316,7 @@ case ${1} in
 	"upgrade"|"update")		do_upgrade;;
 	"remove"|"erase"|"purge")	do_remove;;
 	"template")			do_template;;
+	"status")			do_status;;
 	*)				do_help;;
 esac
 
