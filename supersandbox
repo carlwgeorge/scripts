@@ -24,14 +24,16 @@ _res=$(tput sgr0)    # reset
 
 
 pass() {
-	# print the word PASS in bold green
-	echo -e "${_bld}${_gre}PASS${_res}"
+	# print a bold green check
+	PASS='\xE2\x9C\x94'
+	echo -e "${_bld}${_gre}${PASS}${_res}"
 }
 
 
 fail() {
-	# print a red FAIL and any additional text
-	echo -e "${_bld}${_red}FAIL${_res}\n${_bld}${@}${_res}"
+	# print a bold red x, any additional text, and quit the script
+	FAIL='\xE2\x9C\x98'
+	echo -e "${_bld}${_red}${FAIL}${_res}\n${_bld}${@}${_res}"
 	exit 1
 }
 
