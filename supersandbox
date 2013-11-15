@@ -31,6 +31,12 @@ pass() {
 
 
 fail() {
+	soft_fail ${@}
+	exit 1
+}
+
+
+soft_fail() {
 	# print a bold red x, any additional text, and quit the script
 	FAIL='\xE2\x9C\x98'
 	echo -e "${_bld}${_red}${FAIL}${_res}"
