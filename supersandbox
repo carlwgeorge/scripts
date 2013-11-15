@@ -304,6 +304,9 @@ do_status() {
 			# and then directories named supernova
 			supernova_venvs_in_dir="$(find ${dir} -iname *supernova* -type d | grep -v site-packages | sort | sed 's_^_\t_')"
 			if [[ -n ${supernova_venvs_in_dir} ]]; then
+				if [[ -n ${supernova_venvs} ]]; then
+					supernova_venvs+="\n"
+				fi
 				supernova_venvs+="${supernova_venvs_in_dir}"
 			fi
 		done
