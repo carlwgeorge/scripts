@@ -309,7 +309,7 @@ do_help() {
 	echo -e "\t\tupgrade  \tupgrade the pip pacakges in the environment"
 	echo -e "\t\tremove   \tremove the environment and wrapper scripts"
 	echo -e "\t\ttemplate \tcreate configuration template file"
-	echo -e "\t\tstatus   \tdetect configuration details"
+	echo -e "\t\tstatus   \tcheck the status of your installation"
 	exit 1
 }
 
