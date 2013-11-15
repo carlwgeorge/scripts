@@ -33,7 +33,10 @@ pass() {
 fail() {
 	# print a bold red x, any additional text, and quit the script
 	FAIL='\xE2\x9C\x98'
-	echo -e "${_bld}${_red}${FAIL}${_res}\n${_bld}${@}${_res}"
+	echo -e "${_bld}${_red}${FAIL}${_res}"
+	if [[ -n ${1} ]]; then
+		echo -e "${_bld}${1}${_res}"
+	fi
 	exit 1
 }
 
