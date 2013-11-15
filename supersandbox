@@ -169,7 +169,7 @@ do_install() {
 
 	# activate the virtual environment
 	echo -n "activating virutalenv ${MYINSTALLPATH}..."
-	. ${MYINSTALLPATH}/bin/activate && pass || fail
+	. ${MYINSTALLPATH}/bin/activate &> /dev/null && pass || fail "could not activate ${MYINSTALLPATH}"
 
 	# install pip packages
 	echo -n "installing python-novaclient..."
@@ -185,7 +185,7 @@ do_install() {
 
 	# deactivate the virtual environment
 	echo -n "deactivating virutalenv ${MYINSTALLPATH}..."
-	deactivate && pass || fail
+	deactivate &> /dev/null && pass || fail "could not deactivate ${MYINSTALLPATH}"
 
 	# create wrapper scripts
 	echo -n "creating wrapper scripts..."
@@ -212,7 +212,7 @@ do_upgrade() {
 
 	# activate the virtual environment
 	echo -n "activating virutalenv ${MYINSTALLPATH}..."
-	. ${MYINSTALLPATH}/bin/activate && pass || fail
+	. ${MYINSTALLPATH}/bin/activate &> /dev/null && pass || fail "could not activate ${MYINSTALLPATH}"
 
 	# upgrade pip packages
 	echo -n "updating pbr..."
@@ -232,7 +232,7 @@ do_upgrade() {
 
 	# deactivate the virtual environment
 	echo -n "deactivating virutalenv ${MYINSTALLPATH}..."
-	deactivate && pass || fail
+	deactivate &> /dev/null && pass || fail "could not deactivate ${MYINSTALLPATH}"
 }
 
 
