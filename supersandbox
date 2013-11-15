@@ -273,48 +273,21 @@ do_remove() {
 
 
 do_status() {
-	# what supernova commands are in your PATH?
-	echo "${_bld}all supernova executables in path${_res}:"
-	IFS=':'
-	supernovas_in_path=''
-	for each in ${PATH}; do
-		supernova_in_each="$(find ${each} -name supernova* -type f -executable | sort | sed 's_^_\t_')"
-		if [[ -n ${supernova_in_each} ]]; then
-			if [[ -n ${supernovas_in_path} ]]; then
-				supernovas_in_path+="\n"
-			fi
-			supernovas_in_path+="${supernova_in_each}"
+	# show executables
+	for each in nova supernova supernova-keyring supernova-keyring-helper; do
+		echo -n "testing executable ${MYBINPATH}/${each}..."
+		if [[ -x ${MYBINPATH}/${each} ]]; then
+			pass
+		else
+			fail "could not locate executable ${MYBINPATH}/${each}"
 		fi
-
 	done
-	unset IFS
-	if [[ -n ${supernovas_in_path} ]]; then
-		echo -e "${supernovas_in_path}"
+	# show virtualenvs
+	echo -n "testing directory ${MYINSTALLPATH}..."
+	if [[ -d ${MYINSTALLPATH} ]]; then
+		pass
 	else
-		echo -e "\tNONE"
-	fi
-
-	# are there any existing virtualenvs called supernova?
-	echo "${_bld}possible supernova virtualenvs${_res}:"
-	supernova_venvs=''
-	# check in common locations
-	for each in /usr/local /opt ${HOME}; do
-		# for directories called *virt*env*
-		for dir in $(find ${each} -iname *virt*env* -type d | sort); do
-			# and then directories named supernova
-			supernova_venvs_in_dir="$(find ${dir} -iname *supernova* -type d | grep -v site-packages | sort | sed 's_^_\t_')"
-			if [[ -n ${supernova_venvs_in_dir} ]]; then
-				if [[ -n ${supernova_venvs} ]]; then
-					supernova_venvs+="\n"
-				fi
-				supernova_venvs+="${supernova_venvs_in_dir}"
-			fi
-		done
-	done
-	if [[ -n ${supernova_venvs} ]]; then
-		echo -e "${supernova_venvs}"
-	else
-		echo -e "\tNONE"
+		fail "could not locate virtualenv ${MYINSTALLPATH}"
 	fi
 }
 
