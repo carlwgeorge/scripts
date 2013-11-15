@@ -233,6 +233,8 @@ do_upgrade() {
 	# deactivate the virtual environment
 	echo -n "deactivating virutalenv ${MYINSTALLPATH}..."
 	deactivate &> /dev/null && pass || fail "could not deactivate ${MYINSTALLPATH}"
+
+	echo "${_bld}upgrade process complete${_res}"
 }
 
 
