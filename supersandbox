@@ -233,7 +233,7 @@ do_upgrade() {
 	echo -n "updating supernova-keyring-helper..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${HELPERADDON} &> /dev/null && pass || fail
 	echo -n "saving pip freeze output..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip freeze |& ${SUDO} tee ${MYINSTALLPATH}/freeze.$(date +%F_%T).out &> /dev/null && pass || fail
+	${SUDO} ${MYINSTALLPATH}/bin/pip freeze |& ${SUDO} tee ${MYINSTALLPATH}/freeze.$(date +%s).out &> /dev/null && pass || fail
 
 	# deactivate the virtual environment
 	echo -n "deactivating virutalenv ${MYINSTALLPATH}..."
