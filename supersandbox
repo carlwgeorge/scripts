@@ -274,7 +274,7 @@ do_remove() {
 
 do_status() {
 	# what supernova commands are in your PATH?
-	echo "${_bld}all supernovas in path${_res}:"
+	echo "${_bld}all supernova executables in path${_res}:"
 	IFS=':'
 	supernovas_in_path=''
 	for each in ${PATH}; do
