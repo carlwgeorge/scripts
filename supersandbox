@@ -66,7 +66,6 @@ set_variables() {
 	# set variables based on OS
 	if [[ "${ID}" == "arch" ]]; then
 		PYTHON="python2"
-		PYTHONDEV="python2"
 		VIRTUALENV="virtualenv2"
 		TESTCMD="pacman -Q"
 	elif [[ "${ID}" == "debian" ]]; then
@@ -103,11 +102,13 @@ set_variables() {
 pkg_test() {
 	# test if packages are installed
 	for pkg in ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv gcc; do
-		echo -n "checking for ${pkg} package..."
-		if ${TESTCMD} ${pkg} &> /dev/null; then
-			pass
-		else
-			fail "install ${pkg} and try again"
+		if [[ -n ${pkg} ]]; then
+			echo -n "checking for ${pkg} package..."
+			if ${TESTCMD} ${pkg} &> /dev/null; then
+				pass
+			else
+				fail "install ${pkg} and try again"
+			fi
 		fi
 	done
 }
