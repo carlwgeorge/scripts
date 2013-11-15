@@ -31,7 +31,7 @@ pass() {
 
 
 fail() {
-	soft_fail ${@}
+	soft_fail "${@}"
 	exit 1
 }
 
@@ -40,10 +40,9 @@ soft_fail() {
 	# print a bold red x, any additional text, and quit the script
 	FAIL='\xE2\x9C\x98'
 	echo -e "${_bld}${_red}${FAIL}${_res}"
-	if [[ -n ${1} ]]; then
+	if [[ -n "${1}" ]]; then
 		echo -e "${_bld}${1}${_res}"
 	fi
-	exit 1
 }
 
 
@@ -285,7 +284,7 @@ do_status() {
 		if [[ -x ${MYBINPATH}/${each} ]]; then
 			pass
 		else
-			fail "could not locate executable ${MYBINPATH}/${each}"
+			soft_fail
 		fi
 	done
 	# show virtualenvs
@@ -293,7 +292,7 @@ do_status() {
 	if [[ -d ${MYINSTALLPATH} ]]; then
 		pass
 	else
-		fail "could not locate virtualenv ${MYINSTALLPATH}"
+		soft_fail
 	fi
 }
 
