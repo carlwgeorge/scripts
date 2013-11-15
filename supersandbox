@@ -271,30 +271,25 @@ do_remove() {
 
 
 do_status() {
-	# what is the first supernova in your PATH?
-	echo -e "\n${_bld}default supernova${_res}:"
-	default_supernova="$(which supernova 2> /dev/null)"
-	if [[ -n ${default_supernova} ]]; then
-		echo -e "${default_supernova}\n"
-	else
-		echo -e "NONE\n"
-	fi
-
-	# what about other places in your PATH?
+	# what supernova commands are in your PATH?
 	echo "${_bld}all supernovas in path${_res}:"
 	IFS=':'
 	supernovas_in_path=''
 	for each in ${PATH}; do
-		supernova_in_each="$(find ${each} -name supernova -type f -executable)"
+		supernova_in_each="$(find ${each} -name supernova* -type f -executable | sort | sed 's_^_\t_')"
 		if [[ -n ${supernova_in_each} ]]; then
-			supernovas_in_path+="${supernova_in_each}\n"
+			if [[ -n ${supernovas_in_path} ]]; then
+				supernovas_in_path+="\n"
+			fi
+			supernovas_in_path+="${supernova_in_each}"
 		fi
+
 	done
 	unset IFS
 	if [[ -n ${supernovas_in_path} ]]; then
 		echo -e "${supernovas_in_path}"
 	else
-		echo -e "NONE\n"
+		echo -e "\tNONE"
 	fi
 
 	# are there any existing virtualenvs called supernova?
@@ -303,18 +298,18 @@ do_status() {
 	# check in common locations
 	for each in /usr/local /opt ${HOME}; do
 		# for directories called *virt*env*
-		for dir in $(find ${each} -iname *virt*env* -type d); do
+		for dir in $(find ${each} -iname *virt*env* -type d | sort); do
 			# and then directories named supernova
-			supernova_venvs_in_dir="$(find ${dir} -iname supernova -type d | grep -v site-packages)"
+			supernova_venvs_in_dir="$(find ${dir} -iname *supernova* -type d | grep -v site-packages | sort | sed 's_^_\t_')"
 			if [[ -n ${supernova_venvs_in_dir} ]]; then
-				supernova_venvs+="${supernova_venvs_in_dir}\n"
+				supernova_venvs+="${supernova_venvs_in_dir}"
 			fi
 		done
 	done
 	if [[ -n ${supernova_venvs} ]]; then
 		echo -e "${supernova_venvs}"
 	else
-		echo -e "NONE\n"
+		echo -e "\tNONE"
 	fi
 }
 
