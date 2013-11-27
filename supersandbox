@@ -177,6 +177,8 @@ do_install() {
 	. ${MYINSTALLPATH}/bin/activate &> /dev/null && pass || fail "could not activate ${MYINSTALLPATH}"
 
 	# install pip packages
+	echo -n "installing pbr..."
+	${SUDO} ${MYINSTALLPATH}/bin/pip install pbr &> /dev/null && pass || fail
 	echo -n "installing python-novaclient..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install python-novaclient &> /dev/null && pass || fail
 	echo -n "installing rackspace-novaclient..."
@@ -226,8 +228,6 @@ do_upgrade() {
 	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade python-novaclient &> /dev/null && pass || fail
 	echo -n "updating rackspace-novaclient..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && pass || fail
-	echo -n "updating keyring..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade keyring &> /dev/null && pass || fail
 	echo -n "updating supernova..."
 	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade supernova &> /dev/null && pass || fail
 	echo -n "updating supernova-keyring-helper..."
