@@ -47,6 +47,8 @@ def parse_config():
                 # the option is bogus
                 sys.exit('{0}: invalid option'.format(each))
     # return our info dictionary
+
+    # TODO: what if there options are missing from the config file?
     return info
 
 
