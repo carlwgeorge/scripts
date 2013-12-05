@@ -66,6 +66,8 @@ set_variables() {
 		else
 			ID="redhat"
 		fi
+	elif [[ -x /usr/bin/sw_vers ]]; then
+		ID="osx"
 	fi
 
 	# set variables based on OS
@@ -98,6 +100,10 @@ set_variables() {
 		PYTHONDEV="python27-devel"
 		VIRTUALENV="virtualenv-2.7"
 		TESTCMD="rpm -q"
+	# elif [[ "${ID}" == "osx" ]]; then
+	# 	PYTHON=""    		# [[ -d /usr/local/Cellar/python/ ]]
+	# 	VIRTUALENV=""
+	# 	TESTCMD=""
 	else
 		fail "unrecognized OS: ${ID}"
 	fi
