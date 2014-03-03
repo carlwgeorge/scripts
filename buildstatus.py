@@ -21,9 +21,12 @@ def write(msg):
 def parse_config():
     # parse the config file
     config = configparser.ConfigParser()
-    config_dir = os.environ.get('XDG_CONFIG_HOME',
-                                os.path.expanduser('~/.config'))
-    config_file = config_dir + '/rax.cfg'
+    try:
+        import xdg.BaseDirectory as basedir
+    except ImportError:
+        config_file = [os.path.expanduser("~/.config/rax.cfg")]
+    else:
+        config_file = [basedir.xdg_config_home + "/rax.cfg"]
     config.read(config_file)
 
     info = {'username': '',
