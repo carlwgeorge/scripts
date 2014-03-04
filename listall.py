@@ -6,6 +6,7 @@ This script will list all IPs for cloud servers on multiple accounts.
 References:
 https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md
 https://github.com/rackspace/pyrax/blob/master/docs/cloud_servers.md
+https://github.com/rackspace/pyrax/blob/master/docs/cloud_networks.md
 http://code.google.com/p/prettytable/wiki/Tutorial
 '''
 
@@ -19,46 +20,49 @@ def get_ipv4(ips):
             return ip.get('addr')
 
 
-def server_data(server):
-    data = {}
-    addresses = server.addresses
-    private = get_ipv4(addresses.pop('private'))
-    public = get_ipv4(addresses.pop('public'))
-    if addresses:
-        x, others = addresses.popitem()
-        other = get_ipv4(others)
-    else:
-        other = None
+def server_data(server, network_list, flavor_dict):
+    # start building our row data
+    row = []
+    row.append(server.id)
+    row.append(server.name)
+    row.append(server.metadata.get('rackconnect_automation_status'))
+    row.append(flavor_dict.get(server.flavor.get('id')))
+    row.append(server.accessIPv4)
 
-    data['uuid'] = server.id
-    data['name'] = server.name
-    data['access'] = server.accessIPv4
-    data['public'] = public
-    data['private'] = private
-    data['other'] = other
-    data['rc'] = server.metadata.get('rackconnect_automation_status')
-    return data
+    # get network data
+    addresses = server.addresses
+    for network in network_list:
+        ips = addresses.get(network)
+        if ips:
+            ip = get_ipv4(ips)
+        else:
+            ip = None
+        row.append(ip)
+    return row
 
 
 def create_table(username, apikey):
     pyrax.set_credentials(username, apikey)
-    serverlist = pyrax.cloudservers.list()
-    output = prettytable.PrettyTable(['UUID',
-                                      'name',
-                                      'accessIPv4',
-                                      'public',
-                                      'servicenet',
-                                      'other',
-                                      'RackConnect status'])
-    for server in serverlist:
-        data = server_data(server)
-        output.add_row([data['uuid'],
-                        data['name'],
-                        data['access'],
-                        data['public'],
-                        data['private'],
-                        data['other'],
-                        data['rc']])
+    raw_server_list = pyrax.cloudservers.list()
+    raw_network_list = pyrax.cloud_networks.list()
+    raw_flavor_list = pyrax.cloudservers.flavors.list()
+    flavor_dict = {}
+    for flavor in raw_flavor_list:
+        flavor_dict[flavor.id] = flavor.name
+
+    headers = ['UUID',
+               'name',
+               'RackConnect status',
+               'flavor',
+               'accessIPv4']
+    network_list = []
+    for each in raw_network_list:
+        network_list.append(each.label)
+    headers += network_list
+    output = prettytable.PrettyTable(headers)
+    for server in raw_server_list:
+        row = server_data(server, network_list, flavor_dict)
+        output.add_row(row)
     output.align = 'l'
     output.sortby = 'name'
     return output
@@ -66,8 +70,6 @@ def create_table(username, apikey):
 
 def main():
     pyrax.set_setting('identity_type', 'rackspace')
-    # flavors = {
-    # }
 
     # keys are ddis
     credentials = {
