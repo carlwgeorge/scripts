@@ -13,7 +13,6 @@ except ImportError:
 
 
 def write(msg):
-    ''' My print function. '''
     sys.stdout.write(msg)
     sys.stdout.flush()
 
