@@ -50,7 +50,7 @@ def parse_config():
                 sys.exit('{0}: invalid option'.format(each))
     # return our info dictionary
 
-    # TODO: what if there options are missing from the config file?
+    # TODO: what if their options are missing from the config file?
     return info
 
 
