@@ -106,8 +106,8 @@ def get_mc_status(metadata):
 
 
 def validate_uuid(uuid):
-    pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z'
-    if re.match(pattern, uuid):
+    p = r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z'
+    if re.match(p, uuid):
         return True
     else:
         return False
