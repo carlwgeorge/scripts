@@ -1,0 +1,123 @@
+#!/usr/bin/bash
+
+set -e
+
+if tput setaf 0 &>/dev/null; then
+        ALL_OFF="$(tput sgr0)"
+        BOLD="$(tput bold)"
+        BLUE="${BOLD}$(tput setaf 4)"
+        GREEN="${BOLD}$(tput setaf 2)"
+        RED="${BOLD}$(tput setaf 1)"
+        YELLOW="${BOLD}$(tput setaf 3)"
+else
+        ALL_OFF="\e[1;0m"
+        BOLD="\e[1;1m"
+        BLUE="${BOLD}\e[1;34m"
+        GREEN="${BOLD}\e[1;32m"
+        RED="${BOLD}\e[1;31m"
+        YELLOW="${BOLD}\e[1;33m"
+fi
+
+plain() {
+        local mesg=${1}; shift
+        printf "${BOLD}    ${mesg}${ALL_OFF}\n" "${@}" >&2
+}
+
+msg() {
+        local mesg=${1}; shift
+        printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "${@}" >&2
+}
+
+msg2() {
+        local mesg=${1}; shift
+        printf "${BLUE}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "${@}" >&2
+}
+
+prompt() {
+        local mesg=${1}; shift
+        printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}" >&2
+}
+
+USAGE(){
+	# echo -e "Usage:\t$(basename ${0}) [target]"
+	plain "Usage:\t$(basename ${0}) [targets]..."
+	exit 1
+}
+
+SNATCH_PACKAGE(){
+	TARGET=${1}
+	msg2 "downloading ${TARGET}"
+	cower --target=${BUILD_DIR} --ignorerepo=cwg,pacman -fd ${TARGET} || exit 1
+	cd ${BUILD_DIR}/${TARGET}
+	while :; do
+		prompt "edit PKGBUILD? [Y/n] "
+		read confirm
+		case "${confirm}" in
+			"y"|"Y"|"yes"|"YES"|"Yes"|"") ${EDITOR} PKGBUILD; break ;;
+			"n"|"N"|"no"|"NO"|"No") break;;
+			*) echo "Please enter 'y' or 'n'."
+		esac
+	done
+	if [[ -f ./${TARGET}.install ]]; then 
+		while :; do
+			prompt "edit ${TARGET}.install? [Y/n] "
+			read confirm
+			case "${confirm}" in
+				"y"|"Y"|"yes"|"YES"|"Yes"|"") ${EDITOR} ${TARGET}.install; break ;;
+				"n"|"N"|"no"|"NO"|"No") break;;
+				*) echo "Please enter 'y' or 'n'."
+			esac
+		done
+	fi
+	for PATCH in ./*.patch; do
+		if [[ -f ./*.patch ]]; then 
+			while :; do
+				prompt "edit ${PATCH}? [Y/n] "
+				read confirm
+				case "${confirm}" in
+					"y"|"Y"|"yes"|"YES"|"Yes"|"") ${EDITOR} ${PATCH}; break ;;
+					"n"|"N"|"no"|"NO"|"No") break;;
+					*) echo "Please enter 'y' or 'n'."
+				esac
+			done
+		fi
+	done
+	msg2 "building ${TARGET}"
+	sudo ${BUILD} || exit 1
+	PACKAGES=(*.pkg.tar.xz)
+	for PACKAGE in ${PACKAGES[@]}; do
+		msg2 "moving ${PACKAGE} to ${REPO_DIR}"
+		sudo cp ${PACKAGE} ${REPO_DIR} || exit 1
+	done
+	cd ${ORIG_DIR}
+	msg2 "deleting build directory"
+	rm -rf ${BUILD_DIR}/${TARGET} || exit 1
+}
+
+# set variables
+ORIG_DIR=$(pwd)
+CHROOT="/var/lib/build"
+CLEAN="-c"
+#INSTALL="-- -i"
+BUILD="/usr/bin/makechrootpkg ${CLEAN} -r ${CHROOT} ${INSTALL}"
+REPO_DIR=/srv/http/arch.cgtx.us/x86_64
+
+# if there are zero args, print usage
+if [[ ${#} -eq 0 ]]; then
+	USAGE
+fi
+
+# setup the build directory
+CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
+BUILD_DIR="${CACHE_HOME}/cower"
+[[ -d ${BUILD_DIR} ]] || mkdir -p ${BUILD_DIR}
+
+# build all packages on the command line
+while :; do
+	msg "beginning process for ${1}"
+	SNATCH_PACKAGE ${1}
+	shift
+	if [[ ${#} -eq 0 ]]; then
+		break
+	fi
+done

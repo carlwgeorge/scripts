@@ -1,0 +1,24 @@
+#!/usr/bin/bash
+
+#set -e
+
+## determine build directory
+#if [[ -n "${XDG_CACHE_HOME}" ]]; then
+#	BUILD_DIR="${XDG_CACHE_HOME}/cower"
+#elif [[ -d "${HOME}/.cache" ]]; then
+#	BUILD_DIR="${HOME}/.cache/cower"
+#else
+#	BUILD_DIR="${HOME}/.cower"
+#fi
+#
+## create build directory if necessary
+#if [[ ! -d ${BUILD_DIR} ]]; then
+#	mkdir -p ${BUILD_DIR}
+#fi
+
+REPO_DIR=/srv/http/arch.cgtx.us/x86_64
+
+#sudo cp ${HOME}/*.pkg.tar.xz ${REPO_DIR} &> /dev/null
+#rm -f ${HOME}/*.pkg.tar.xz
+sudo rm -f ${REPO_DIR}/cwg.db.tar.gz
+sudo repo-add ${REPO_DIR}/cwg.db.tar.gz ${REPO_DIR}/*.pkg.tar.xz
