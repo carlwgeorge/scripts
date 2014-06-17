@@ -1,0 +1,27 @@
+#!/bin/bash
+
+GIT_CONF_FILE=./.git/config
+if [[ ! -f ${GIT_CONF_FILE} ]]; then
+	echo "Please run from a git repo directory."
+	exit 1
+fi
+
+REMOTE_SERVER=$(egrep -o 'github[^:]+' ${GIT_CONF_FILE})
+case ${REMOTE_SERVER} in
+	github.com)
+		GIT_USER='cgtx'
+		GIT_EMAIL='carl@carlgeorge.us'
+		;;
+	github.rackspace.com)
+		GIT_USER='carl.george'
+		GIT_EMAIL='carl.george@rackspace.com'
+		;;
+	*)
+		echo "Unrecognized remote server: ${REMOTE_SERVER}"
+		exit 1
+		;;
+esac
+
+git config user.name ${GIT_USER}
+git config user.email ${GIT_EMAIL}
+git config push.default simple
