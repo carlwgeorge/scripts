@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import subprocess
+import tempfile
+import requests
+
+
+def template(pkg, dead=False):
+    if dead:
+        target = 'dead.package'
+    else:
+        target = pkg + '.spec'
+    #  ?h=el6  ?h=f18
+    url = 'http://pkgs.fedoraproject.org/cgit/{PKG}.git/plain/{TARGET}'
+    return url.format(PKG=pkg, TARGET=target)
+
+
+def grab(url):
+    for attempt in range(3):
+        try:
+            response = requests.get(url)
+        except requests.exceptions.ConnectionError:
+            print('no response from url, trying again')
+        else:
+            break
+    else:
+        sys.exit('max tries exceeded')
+    return response
+
+
+def control(pkg, alive):
+    if alive:
+        url = template(pkg)
+    else:
+        url = template(pkg, dead=True)
+    return grab(url)
+
+
+def edit(text):
+    editor = os.getenv('EDITOR') or 'vim'
+    cmdline = [editor]
+    if editor == 'vim':
+        cmdline.append('-c')
+        cmdline.append('set ft=spec')
+    with tempfile.NamedTemporaryFile(mode='wt') as f:
+        f.write(text)
+        f.flush()
+        cmdline.append(f.name)
+        subprocess.call(cmdline)
+
+
+def main():
+    try:
+        pkg = sys.argv[1]
+    except IndexError:
+        sys.exit('Usage: {} <package-name>'.format(sys.argv[0]))
+    for alive in [True, False]:
+        result = control(pkg, alive)
+        if result.ok:
+            break
+    edit(result.text)
+
+
+if __name__ == '__main__':
+    main()
+
+# vim: ft=python sw=4 ts=4 et
