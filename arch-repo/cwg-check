@@ -2,7 +2,6 @@
 
 #set -e
 
-REPO_DIR=/srv/http/arch.cgtx.us/x86_64
 IGNORE=(
 	clucker
 	cwg-meta-apps-cli
@@ -61,15 +60,6 @@ error() {
 	printf "${RED}==> $(gettext "ERROR:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
 
-query_file() {
-	pacman -Q --info --file ${1} \
-	| awk -v x=${2} '$1==x{print$3}'
-}
-
-query_aur() {
-	cower --ignorerepo=cwg,pacman --info --format '%v' ${1} 2>/dev/null
-}
-
 skip_check() {
 	local PKG=${1}
 	for i in ${IGNORE[@]}; do
@@ -80,34 +70,53 @@ skip_check() {
 	return 1
 }
 
-check() {
-	local PKG=${1}
-	NAME=$(query_file ${PKG} Name)
-	if skip_check ${NAME}; then
-		return 0
-	fi
-	FILEVERSION=$(query_file ${PKG} Version)
-	AURVERSION=$(query_aur ${NAME})
-	if [[ -z ${AURVERSION} ]]; then
-		error "${NAME} not found in the AUR"
-	elif [[ ${FILEVERSION} == ${AURVERSION} ]]; then
-		msg "${NAME} PASS"
+query_version() {
+	local REPO=${1}
+	local PKG=${2}
+	if [[ ${REPO} == 'aur' ]]; then
+		cower --ignorerepo=cwg --info --format '%v' ${PKG} 2>/dev/null
 	else
-		error "${NAME} FAIL"
-		msg2 "local: ${FILEVERSION}"
-		msg2 "AUR: ${AURVERSION}"
+		pacman --sync --print --print-format '%v' --nodeps --nodeps ${REPO}/${PKG}
 	fi
 }
 
+check() {
+	local PKG=${1}
+	if skip_check ${PKG}; then
+		# if package is in skip list, abort cleanly
+		return 0
+	fi
+	# obtain the versions
+	REPO_VERSION=$(query_version cwg ${PKG})
+	AUR_VERSION=$(query_version aur ${PKG})
+	if [[ -z ${AUR_VERSION} ]]; then
+		error "${PKG} not found in the AUR"
+	elif [[ ${REPO_VERSION} == ${AUR_VERSION} ]]; then
+		msg "MATCH ${PKG}"
+	else
+		error "DIFFERENT ${PKG}"
+		msg2 "local: ${REPO_VERSION}"
+		msg2 "AUR: ${AUR_VERSION}"
+	fi
+}
+
+repo_list() {
+	pacman --sync --quiet --list ${1}
+}
 
 main() {
-	local PKG
-	local ARG
+	msg "refreshing package cache"
+	sudo pacman --sync --refresh
 	if [[ ${#} -eq 0 ]]; then
-		for PKG in ${REPO_DIR}/*.pkg.tar.xz; do
+		# no arguments, check everything
+		local PKG
+		local PKG_LIST=($(repo_list cwg))
+		for PKG in ${PKG_LIST[@]}; do
 			check ${PKG}
 		done
 	else
+		# check each argument
+		local ARG
 		for ARG in ${@}; do
 			check ${ARG}
 		done
