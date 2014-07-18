@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-set -e
+#set -e
 
 if tput setaf 0 &>/dev/null; then
         ALL_OFF="$(tput sgr0)"
@@ -31,6 +31,16 @@ msg() {
 msg2() {
         local mesg=${1}; shift
         printf "${BLUE}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "${@}" >&2
+}
+
+warning() {
+	local mesg=${1}; shift
+	printf "${YELLOW}==> $(gettext "WARNING:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "${@}" >&2
+}
+
+error() {
+	local mesg=${1}; shift
+	printf "${RED}==> $(gettext "ERROR:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "${@}" >&2
 }
 
 prompt() {
@@ -83,15 +93,20 @@ SNATCH_PACKAGE(){
 		fi
 	done
 	msg2 "building ${TARGET}"
-	sudo ${BUILD} || exit 1
+	sudo ${BUILD}
 	PACKAGES=(*.pkg.tar.xz)
+	if [[ ${PACKAGES[0]} == '*.pkg.tar.xz' ]]; then
+	#if [[ ${#PACKAGES[@]} == 0 ]]; then
+		error "no packages found after build"
+		exit 1
+	fi
 	for PACKAGE in ${PACKAGES[@]}; do
 		msg2 "moving ${PACKAGE} to ${REPO_DIR}"
-		sudo cp ${PACKAGE} ${REPO_DIR} || exit 1
+		sudo cp ${PACKAGE} ${REPO_DIR}
 	done
 	cd ${ORIG_DIR}
 	msg2 "deleting build directory"
-	rm -rf ${BUILD_DIR}/${TARGET} || exit 1
+	rm -rf ${BUILD_DIR}/${TARGET}
 }
 
 # set variables
