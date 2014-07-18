@@ -29,5 +29,7 @@ msg() {
 # set variables
 CHROOT="/var/lib/build"
 
+msg "cleaning ${CHROOT}/root"
+sudo arch-nspawn ${CHROOT}/root pacman -Scc
 msg "refreshing ${CHROOT}/root"
 sudo arch-nspawn ${CHROOT}/root pacman -Syu
