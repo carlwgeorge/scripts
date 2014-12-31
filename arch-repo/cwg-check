@@ -2,6 +2,8 @@
 
 #set -e
 
+MYREPO='cwg'
+
 IGNORE=(
 	clucker
 	cwg-meta-apps-cli
@@ -11,7 +13,7 @@ IGNORE=(
 	cwg-meta-python
 	cwg-meta-rackspace
 	hammertime
-	pidgin-sametime
+	pidgin-minimal
 )
 
 if tput setaf 0 &>/dev/null; then
@@ -67,6 +69,9 @@ skip_check() {
 			return 0
 		fi
 	done
+	if [[ ${PKG} == *-git ]]; then
+		return 0
+	fi
 	return 1
 }
 
@@ -74,7 +79,7 @@ query_version() {
 	local REPO=${1}
 	local PKG=${2}
 	if [[ ${REPO} == 'aur' ]]; then
-		cower --ignorerepo=cwg --info --format '%v' ${PKG} 2>/dev/null
+		cower --ignorerepo=${MYREPO} --info --format '%v' ${PKG} 2>/dev/null
 	else
 		pacman --sync --print --print-format '%v' --nodeps --nodeps ${REPO}/${PKG}
 	fi
@@ -87,21 +92,34 @@ check() {
 		return 0
 	fi
 	# obtain the versions
-	REPO_VERSION=$(query_version cwg ${PKG})
+	REPO_VERSION=$(query_version ${MYREPO} ${PKG})
 	AUR_VERSION=$(query_version aur ${PKG})
+	# sanity checks
 	if [[ -z ${AUR_VERSION} ]]; then
-		error "${PKG} not found in the AUR"
-	elif [[ ${REPO_VERSION} == ${AUR_VERSION} ]]; then
-		msg "MATCH ${PKG}"
+		warning "${PKG} not found in the AUR"
+	elif [[ -z ${REPO_VERSION} ]]; then
+		warning "${PKG} not found in the repo"
 	else
-		error "DIFFERENT ${PKG}"
-		msg2 "local: ${REPO_VERSION}"
-		msg2 "AUR: ${AUR_VERSION}"
+		# does it match?
+		if [[ ${REPO_VERSION} == ${AUR_VERSION} ]]; then
+			msg "MATCH ${PKG}"
+		else
+			REPO_DESC="${MYREPO} version (${REPO_VERSION})"
+			AUR_DESC="AUR version (${AUR_VERSION})"
+			if [[ $(echo -e "${REPO_VERSION}\n${AUR_VERSION}" | sort -V | tail -1) == ${AUR_VERSION} ]]; then
+				error "UPDATE ${PKG} - ${AUR_DESC} newer than ${REPO_DESC}"
+			elif [[ $(echo -e "${REPO_VERSION}\n${AUR_VERSION}" | sort -V | tail -1) == ${REPO_VERSION} ]]; then
+				warning "NEWER ${PKG} - ${REPO_DESC} newer than ${AUR_DESC}"
+			else
+				error "unknown version conflict for ${PKG}"
+			fi
+		fi
 	fi
 }
 
 repo_list() {
-	pacman --sync --quiet --list ${1}
+	local REPO=${1}
+	pacman --sync --quiet --list ${REPO}
 }
 
 main() {
@@ -110,7 +128,7 @@ main() {
 	if [[ ${#} -eq 0 ]]; then
 		# no arguments, check everything
 		local PKG
-		local PKG_LIST=($(repo_list cwg))
+		local PKG_LIST=($(repo_list ${MYREPO}))
 		for PKG in ${PKG_LIST[@]}; do
 			check ${PKG}
 		done
