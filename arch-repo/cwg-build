@@ -1,6 +1,8 @@
 #!/usr/bin/bash
 
-#set -e
+set -e
+
+MYREPO='cwg'
 
 if tput setaf 0 &>/dev/null; then
         ALL_OFF="$(tput sgr0)"
@@ -56,9 +58,15 @@ USAGE(){
 
 SNATCH_PACKAGE(){
 	TARGET=${1}
-	msg2 "downloading ${TARGET}"
-	cower --target=${BUILD_DIR} --ignorerepo=cwg,pacman -fd ${TARGET} || exit 1
-	cd ${BUILD_DIR}/${TARGET}
+	# hit the AUR API to find the pkgbase
+	BASE=$(python -c "import requests; print(requests.get('https://aur.archlinux.org/rpc.php', params={'type': 'info', 'arg': '${TARGET}'}).json().get('results').get('PackageBase'))")
+	if [[ ${TARGET} == ${BASE} ]]; then
+		msg "downloading ${TARGET}"
+	else
+		msg "pkgbase of ${TARGET} is ${BASE}, downloading ${BASE}"
+	fi
+	cower --target=${BUILD_DIR} --ignorerepo=${MYREPO} -fd ${TARGET}
+	cd ${BUILD_DIR}/${BASE}
 	while :; do
 		prompt "edit PKGBUILD? [Y/n] "
 		read confirm
@@ -69,14 +77,16 @@ SNATCH_PACKAGE(){
 		esac
 	done
 	if [[ -f ./${TARGET}.install ]]; then 
-		while :; do
-			prompt "edit ${TARGET}.install? [Y/n] "
-			read confirm
-			case "${confirm}" in
-				"y"|"Y"|"yes"|"YES"|"Yes"|"") ${EDITOR} ${TARGET}.install; break ;;
-				"n"|"N"|"no"|"NO"|"No") break;;
-				*) echo "Please enter 'y' or 'n'."
-			esac
+		for INSTALL in *.install; do
+			while :; do
+				prompt "edit ${INSTALL}? [Y/n] "
+				read confirm
+				case "${confirm}" in
+					"y"|"Y"|"yes"|"YES"|"Yes"|"") ${EDITOR} ${INSTALL}; break ;;
+					"n"|"N"|"no"|"NO"|"No") break;;
+					*) echo "Please enter 'y' or 'n'."
+				esac
+			done
 		done
 	fi
 	for PATCH in ./*.patch; do
